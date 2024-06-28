@@ -1,17 +1,17 @@
 class Cells:
 
-    def __init__(self, grid, v, h):
+    def __init__(self, v, h, SIZE_V, SIZE_H):
         self._value = 0
         self._will_live = False
-        self._grid = grid
         self._v = v
         self._h = h
+        self._SIZE_V = SIZE_V
+        self._SIZE_H = SIZE_H
 
     @property
     def v(self):
         return self._v
 
-    # Setter pour l'attribut age
     @v.setter
     def v(self, value):
         self._v = value
@@ -20,63 +20,69 @@ class Cells:
     def h(self):
         return self._h
 
-    # Setter pour l'attribut age
     @h.setter
     def h(self, value):
         self._h = value
 
-    def is_alive(self, v, h):
-        return self._grid[v][h] == 1
+    @property
+    def value(self):
+        return self._value
 
-    def is_dead(self, v, h):
-        return self._grid[v][h] == 0
+    @value.setter
+    def value(self, value):
+        self._value = value
 
-    def live(self, v, h):
-        self._grid[v][h] = 1
+    def is_alive(self):
+        return self._value == 1
 
-    def kill(self, v, h):
-        self._grid[v][h] = 0
+    def is_dead(self):
+        return self._value == 0
 
-    def is_top_limit(self, v, a):
-        return v == 0 and a == -1
+    def live(self):
+        self._value = 1
 
-    def is_right_limit(self, h, a):
-        return h == len(self._grid[0]) - 1 and a == 1
+    def kill(self):
+        self._value = 0
 
-    def is_left_limit(self, h, a):
-        return h == 0 and a == -1
+    def is_top_limit(self, a):
+        return self._v == 0 and a == -1
 
-    def is_bottom_limit(self, v, a):
-        return v == len(self._grid) - 1 and a == 1
+    def is_right_limit(self, a):
+        return self._h == self._SIZE_H - 1 and a == 1
 
-    def count_alive_neighbours(self, v, h):
+    def is_left_limit(self, a):
+        return self._h == 0 and a == -1
+
+    def is_bottom_limit(self, a):
+        return self._v == self._SIZE_V - 1 and a == 1
+
+    def count_alive_neighbours(self, grid):
         count = 0
         for i in range(-1, 2):
-            if self.is_top_limit(v, i):
+            if self.is_top_limit(i):
                 break
-            elif self.is_bottom_limit(v, i):
+            elif self.is_bottom_limit(i):
                 break
 
             for j in range(-1, 2):
-                if self.is_left_limit(h, j):
+                if self.is_left_limit(j):
                     break
-                elif self.is_right_limit(h, j):
+                elif self.is_right_limit(j):
                     break
-                elif self._grid[v + i][h + j] == 1:
+                elif grid[self._v + i][self._h + j] == 1:
                     count += 1
         return count
 
-    def should_live_or_die(self):
-        count = self.count_alive_neighbours(self.v, self.h)
-
-        if count >= 3 and self.is_dead(self.v, self.h):
-            self.live(self.v, self.h)
-        elif count >= 2 and self.is_alive(self.v, self.h):
-            self.live(self.v, self.h)
-        elif (count < 2 or count > 3) and self.is_alive(self.v, self.h):
-            self.kill(self.v, self.h)
+    def should_live_or_die(self, grid):
+        count = self.count_alive_neighbours(grid)
+        if count >= 3 and self.is_dead():
+            self.live()
+        elif count >= 2 and self.is_alive():
+            self.live()
+        elif (count < 2 or count > 3) and self.is_alive():
+            self.kill()
         else:
-            self.kill(self.v, self.h)
+            self.kill()
 
     def to_string(self):
-        print(self._value)
+        print(self._value, end=" ")
